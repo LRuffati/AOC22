@@ -5,13 +5,13 @@ mod days;
 use days::*;
 
 fn main() {
-    const PTH: &str = "inputs/01";
-    let file = File::open(PTH).expect("Can't find file");
+    let pth: String = Curr::path();
+    let file = File::open(pth.as_str()).expect("Can't find file");
     let reader = BufReader::new(file);
     let day = Curr::create(reader);
     day.solve_a();
 
-    let file = File::open(PTH).expect("Can't find file");
+    let file = File::open(pth.as_str()).expect("Can't find file");
     let reader = BufReader::new(file);
     let day = Curr::create(reader);
     day.solve_b();

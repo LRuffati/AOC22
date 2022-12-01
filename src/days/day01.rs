@@ -40,6 +40,8 @@ pub struct Day1(
 );
 
 impl Day for Day1 {
+    const DAY: usize = 1;
+
     fn create(input: BufReader<File>) -> Self {
         Day1(Box::new(input.lines().map(|num| num.unwrap().parse::<usize>().ok())))
     }
