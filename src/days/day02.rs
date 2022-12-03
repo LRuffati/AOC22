@@ -106,8 +106,6 @@ impl Second {
     }
 }
 
-
-
 impl Day for Day2 {
     const DAY: usize = 2;
 
