@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::BufReader;
 
 mod days;
+mod lib;
 
 use days::*;
 
