@@ -5,6 +5,7 @@ mod day04;
 mod day05;
 mod day06;
 mod day07;
+mod day08;
 
 use std::fs::File;
 use std::io::BufReader;
@@ -23,4 +24,4 @@ pub trait Day {
     fn solve_b(self);
 }
 
-pub type Curr = day07::Day7;
+pub type Curr = day08::Day8;
