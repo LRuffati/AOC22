@@ -49,7 +49,7 @@ enum Node{
 impl Node {
     fn size(&self) -> usize {
         match self {
-            Node::Dir { p, sz, files, dir } => *sz,
+            Node::Dir { p: _, sz, files: _, dir: _ } => *sz,
             Node::File(_, sz) => *sz
         }
     }
@@ -81,7 +81,7 @@ impl Day for Day7 {
         let mut modified = false;
 
         for l in input.lines().map(|x| x.unwrap()){
-            let mut caps = re.captures(l.as_str()).unwrap();
+            let caps = re.captures(l.as_str()).unwrap();
             if let Some(dest) = caps.name("dest") {
                 if modified {
                     //println!("Inserting {:?}, sz: {}", curr, curr_sz);
@@ -118,7 +118,7 @@ impl Day for Day7 {
         for d in visited_dirs.into_iter().rev() {
             let mut entry = fs.remove(&d).unwrap();
             match &mut entry {
-                Node::Dir { p, sz, files, dir } => {
+                Node::Dir { p: _, sz, files: _, dir } => {
                     //println!("Tot sz of {:?}, start: {}", p, *sz);
                     for dc in dir {
                         *sz += fs.get(&dc).unwrap().size();

@@ -29,26 +29,18 @@ impl Ord for Tree {
 
 /// highest is the highest already visited tree in this axis, heap contains
 /// the trees which are visible from yet to be visited spots
-fn add_tree(t: Tree, highest: &mut Tree, heap: &mut BinaryHeap<Reverse<Tree>>) -> bool{
+fn add_tree(t: Tree, highest: &mut Tree, heap: &mut Vec<Tree>) -> bool{
     if *highest < t { // If tree is taller than the highest it is visible from
                       // the beginning and obscures the following ones which are smaller
-        println!("{:?} > {:?}, updating highest", t, highest);
+        //println!("{:?} > {:?}, updating highest", t, highest);
         *highest = t; 
         heap.clear(); // Trees in the heap are smaller or equal than the tallest, so
                       // they end up between two larger trees, won't be visible
         true
     } else {
         // Add the tree to the heap
-        while let Some(Reverse(el)) = heap.peek(){
-            if (*el).0 <= t.0 { // Trees in the heap are already hidden on one side, this tree would
-                                // hide them on the other as well
-                println!("{:?} <= {:?}, popping", el, t);
-                heap.pop();
-            } else {
-                break;
-            }
-        }
-        heap.push(Reverse(t));
+        *heap = heap.iter_mut().filter(|x| (x).0 > t.0).map(|z|*z).collect();
+        heap.push(t);
         false
     }
 }
@@ -68,8 +60,8 @@ impl Day for Day8 {
             vis.insert(*i);
         }
 
-        let mut heaps_col: Vec<BinaryHeap<Reverse<Tree>>> = max_col_up.iter().map(|_| BinaryHeap::new()).collect();
-        let mut heap_row: BinaryHeap<Reverse<Tree>> = BinaryHeap::new();
+        let mut heaps_col: Vec<Vec<Tree>> = max_col_up.iter().map(|_| Vec::new()).collect();
+        let mut heap_row: Vec<Tree> = Vec::new();
 
         for (r, x) in x{
             let mut l_it = x.unwrap().into_bytes().into_iter().enumerate().map(|(c, e)| {Tree(e-48, (r, c))});
@@ -81,19 +73,20 @@ impl Day for Day8 {
                 let in_ver = add_tree(t, mc, hc);
                 
                 if in_hor || in_ver {
-                    println!("{:?} visible", t);
+                    //println!("{:?} visible", t);
                     vis.insert(t);
                 }
             }
-            for t in heap_row.drain(){
-                println!("{:?} visible from right", t.0);
-                vis.insert(t.0);
+            for t in heap_row.iter(){
+                //println!("{:?} visible from right", t.0);
+                vis.insert(*t);
             }
+            heap_row.clear();
         }
         for mut h in heaps_col.into_iter().skip(1) {
-            for t in h.drain(){
-                println!("{:?} visible from low", t.0);
-                vis.insert(t.0);
+            for t in h {
+                //println!("{:?} visible from low", t.0);
+                vis.insert(t);
             }
         }
 
