@@ -28,7 +28,7 @@ pub struct Day8(VecDeque<VecDeque<Tree>>);
 impl Day for Day8 {
     const DAY: usize = 8;
 
-    fn create(input: std::io::BufReader<std::fs::File>) -> Self {
+    fn create<B: BufRead>(input: B) -> Self {
         let x: _ = input.lines().into_iter().enumerate().map(|(r, l)|{
             l.unwrap().as_bytes().iter().enumerate().map(|(c, e)| Tree(*e - 48, (r, c))).collect()
         }).collect();
@@ -111,9 +111,9 @@ impl Day for Day8 {
     }
 }
 
-fn find_view<const t: bool>(line: impl IntoIterator<Item=Tree>, map: &mut BTreeMap<Tree, usize>) {
+fn find_view<const T: bool>(line: impl IntoIterator<Item=Tree>, map: &mut BTreeMap<Tree, usize>) {
     let mut add_to_view = |tree: Tree, view: usize| -> () {map.entry(tree).and_modify(|v| {*v = *v * view}).or_insert(view);};
-    let lambda = if t {
+    let lambda = if T {
         |x: &Tree| -> usize {(x.1).1}
     } else {
         |x: &Tree| -> usize {(x.1).0}
@@ -152,4 +152,26 @@ fn find_view<const t: bool>(line: impl IntoIterator<Item=Tree>, map: &mut BTreeM
 fn resize_vec<T>(v: &mut VecDeque<T>){
     v.pop_back();
     v.pop_front();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static INPUT: &str = "30373
+25512
+65332
+33549
+35390";
+
+    #[test]
+    fn test_a(){
+        let d =  Day8::create(INPUT.as_bytes());
+        d.solve_a();
+    }
+
+    #[test]
+    fn test_b(){
+        let d =  Day8::create(INPUT.as_bytes());
+        d.solve_b();
+    }
 }

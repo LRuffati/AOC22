@@ -1,5 +1,4 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use crate::days::Day;
 
 struct Acc {
@@ -35,14 +34,14 @@ impl Acc {
     }
 }
 
-pub struct Day1(
-    Box<dyn Iterator<Item=Option<usize>>>
+pub struct Day1<'a>(
+    Box<dyn Iterator<Item=Option<usize>> + 'a>
 );
 
-impl Day for Day1 {
+impl<'a> Day for Day1<'a> {
     const DAY: usize = 1;
 
-    fn create(input: BufReader<File>) -> Self {
+    fn create<B:'a + BufRead>(input: B) -> Self {
         Day1(Box::new(input.lines().map(|num| num.unwrap().parse::<usize>().ok())))
     }
 
@@ -61,5 +60,37 @@ impl Day for Day1 {
         res.reverse();
         let ret = res.iter().take(3).map(|e|e.1).reduce(|a, e| a+e);
         println!("{}", ret.unwrap());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static INPUT: &str = "1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000
+";
+
+    #[test]
+    fn test_a(){
+        let d =  Day1::create(INPUT.as_bytes());
+        d.solve_a();
+    }
+
+    #[test]
+    fn test_b(){
+        let d =  Day1::create(INPUT.as_bytes());
+        d.solve_b();
     }
 }

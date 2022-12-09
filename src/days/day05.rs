@@ -1,5 +1,4 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use crate::days::Day;
 use regex::Regex;
 
@@ -12,7 +11,7 @@ pub struct Day5{
 impl Day for Day5 {
     const DAY: usize = 5;
 
-    fn create(input: BufReader<File>) -> Self {
+    fn create<B: BufRead>(input: B) -> Self {
         let mut itl = input.lines().map(|x| x.unwrap());
         let mut vec_vecs = Vec::new();
         for s in itl.by_ref().take_while(|x| !x.starts_with(" 1")){
@@ -57,5 +56,32 @@ impl Day for Day5 {
             self.cols[t-1].append(&mut x);
         }
         println!("{}", std::str::from_utf8(&self.cols.iter().map(|x| *(x.last().unwrap())).collect::<Vec<u8>>()).unwrap());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static INPUT: &str = "    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
+";
+
+    #[test]
+    fn test_a(){
+        let d =  Day5::create(INPUT.as_bytes());
+        d.solve_a();
+    }
+
+    #[test]
+    fn test_b(){
+        let d =  Day5::create(INPUT.as_bytes());
+        d.solve_b();
     }
 }

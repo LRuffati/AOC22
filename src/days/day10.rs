@@ -4,7 +4,7 @@ pub struct Day();
 impl super::Day for Day {
     const DAY: usize = 10;
 
-    fn create(input: std::io::BufReader<std::fs::File>) -> Self {
+    fn create<B: BufRead>(input: B) -> Self {
         return Day();
     }
 
@@ -14,5 +14,23 @@ impl super::Day for Day {
 
     fn solve_b(mut self) {
         println!("")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::days::Day;
+    static INPUT: &str = "";
+
+    #[test]
+    fn test_a(){
+        let d =  super::Day::create(INPUT.as_bytes());
+        d.solve_a();
+    }
+
+    #[test]
+    fn test_b(){
+        let d =  super::Day::create(INPUT.as_bytes());
+        d.solve_b();
     }
 }

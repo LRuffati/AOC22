@@ -36,7 +36,7 @@ pub struct Day(Vec<(Coord, Coord)>);
 impl super::Day for Day {
     const DAY: usize = 9;
 
-    fn create(input: std::io::BufReader<std::fs::File>) -> Self {
+    fn create<B: BufRead>(input: B) -> Self {
         let (v, _, _) = input.lines().fold((vec![((0,0),(0,0))], (0,0), (0,0)), |(mut v, mut h, mut t), e|{
             let st = e.unwrap();
             let (d, s) = st.split_once(' ').unwrap();
@@ -72,7 +72,7 @@ impl super::Day for Day {
         let mut s = HashSet::new();
         let mut t: [Coord; 8] = [(0,0); 8];
         s.insert(t[7]);
-        for (rh, ft) in self.0 {
+        for (_rh, ft) in self.0 {
             let mut h = ft;
             for i in 0..8 {
                 let m = t[i].follow(&h);
@@ -83,5 +83,44 @@ impl super::Day for Day {
             s.insert(t[7]);
         } 
         println!("{}", s.len())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::days::Day;
+    static INPUTS: [&str; 2] = ["R 4
+U 4
+L 3
+D 1
+R 4
+D 1
+L 5
+R 2
+", 
+"R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20
+"];
+
+    #[test]
+    fn test_a(){
+        for i in INPUTS {
+            let d =  super::Day::create(i.as_bytes());
+            d.solve_a();
+        }
+    }
+
+    #[test]
+    fn test_b(){
+        for i in INPUTS{
+            let d =  super::Day::create(i.as_bytes());
+            d.solve_b();
+        }
     }
 }

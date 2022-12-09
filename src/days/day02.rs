@@ -1,10 +1,9 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use std::str::FromStr;
 use crate::days::Day;
 
-pub struct Day2(
-    Box<dyn Iterator<Item=(First, Second)>>
+pub struct Day2<'a>(
+    Box<dyn Iterator<Item=(First, Second)>+'a>
 );
 
 #[derive(Debug)]
@@ -106,10 +105,10 @@ impl Second {
     }
 }
 
-impl Day for Day2 {
+impl<'a> Day for Day2<'a> {
     const DAY: usize = 2;
 
-    fn create(input: BufReader<File>) -> Self {
+    fn create<B: BufRead + 'a>(input: B) -> Self {
         Day2(Box::new(input.lines().map(|ln| {
             let ln = ln.unwrap();
             let mut ws = ln.split_whitespace();
@@ -130,5 +129,25 @@ impl Day for Day2 {
         println!("{}", self.0.fold(0usize, |a, e|{
             a + usize::from(Second::result2(e.0, e.1))
         }));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static INPUT: &str = "A Y
+B X
+C Z";
+
+    #[test]
+    fn test_a(){
+        let d =  Day2::create(INPUT.as_bytes());
+        d.solve_a();
+    }
+
+    #[test]
+    fn test_b(){
+        let d =  Day2::create(INPUT.as_bytes());
+        d.solve_b();
     }
 }

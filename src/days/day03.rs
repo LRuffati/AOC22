@@ -1,20 +1,19 @@
 use std::collections::BTreeSet;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use crate::days::Day;
 
-pub struct Day3(
-    Box<dyn Iterator<Item=(Vec<u8>, Vec<u8>)>>
+pub struct Day3<'a>(
+    Box<dyn Iterator<Item=(Vec<u8>, Vec<u8>)> +'a>
 );
 
 fn to_list(s: String) -> Vec<u8>{
     s.into_bytes().into_iter().map(|c| {if c>=97 {c-96} else {c-64+26}}).collect()
 }
 
-impl Day for Day3 {
+impl<'a> Day for Day3<'a> {
     const DAY: usize = 3;
 
-    fn create(input: BufReader<File>) -> Self {
+    fn create<B: BufRead + 'a>(input: B) -> Self {
         let a = input.lines().map(|ln|{
             let mut fs = ln.unwrap();
             let sn = fs.split_off(fs.len()/2);
@@ -53,5 +52,29 @@ impl Day for Day3 {
                 }
                 a
             }).0);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static INPUT: &str = "vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw
+";
+
+    #[test]
+    fn test_a(){
+        let d =  Day3::create(INPUT.as_bytes());
+        d.solve_a();
+    }
+
+    #[test]
+    fn test_b(){
+        let d =  Day3::create(INPUT.as_bytes());
+        d.solve_b();
     }
 }

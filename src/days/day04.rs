@@ -1,10 +1,9 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use std::str::FromStr;
 use crate::days::Day;
 
-pub struct Day4(
-    Box<dyn Iterator<Item=Vec<Assignment>>>
+pub struct Day4<'a>(
+    Box<dyn Iterator<Item=Vec<Assignment>> + 'a>
 );
 
 struct Assignment(usize, usize);
@@ -42,10 +41,10 @@ impl Assignment {
     }
 }
 
-impl Day for Day4 {
+impl<'a> Day for Day4<'a> {
     const DAY: usize = 4;
 
-    fn create(input: BufReader<File>) -> Self {
+    fn create<B: BufRead + 'a>(input: B) -> Self {
         let r = input.lines().map(|l| {
             l.unwrap().split(",").map(|s| s.parse::<Assignment>().unwrap()).collect::<Vec<Assignment>>()
         });
@@ -68,5 +67,29 @@ impl Day for Day4 {
                 a+1
             } else { a }
         }));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static INPUT: &str = "2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8
+";
+
+    #[test]
+    fn test_a(){
+        let d =  Day4::create(INPUT.as_bytes());
+        d.solve_a();
+    }
+
+    #[test]
+    fn test_b(){
+        let d =  Day4::create(INPUT.as_bytes());
+        d.solve_b();
     }
 }

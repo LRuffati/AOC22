@@ -1,8 +1,8 @@
 use nom::InputTakeAtPosition;
 use nom::character::complete::{alphanumeric1, multispace0, digit1, multispace1};
 use nom::combinator::{map_res, map};
-use nom::error::{Error};
-use nom::multi::{many0, many1};
+use nom::error::Error;
+use nom::multi::many0;
 use nom::sequence::{delimited, tuple};
 use nom::{IResult, combinator::value, sequence::preceded, branch::alt};
 use nom::bytes::complete::tag;

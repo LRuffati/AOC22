@@ -1,6 +1,5 @@
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use regex::Regex;
 
 use crate::days::Day;
@@ -70,7 +69,7 @@ pub struct Day7 {
 impl Day for Day7 {
     const DAY: usize = 7;
 
-    fn create(input: BufReader<File>) -> Self {
+    fn create<B: BufRead>(input: B) -> Self {
         let re = Regex::new(r"(?P<cmd>\$ (cd (?P<dest>.+)|ls)|dir (?P<chd_d>.+)|(?P<fls>\d+) (?P<fln>.+))").unwrap();
         let mut fs: HashMap<Path, Node> = HashMap::new();
         let mut curr = Path::root();
@@ -155,5 +154,46 @@ impl Day for Day7 {
             if (sz >= targ) && (sz < min) {min = sz}
         }
         println!("{}", min);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static INPUT: &str = "$ cd /
+$ ls
+dir a
+14848514 b.txt
+8504156 c.dat
+dir d
+$ cd a
+$ ls
+dir e
+29116 f
+2557 g
+62596 h.lst
+$ cd e
+$ ls
+584 i
+$ cd ..
+$ cd ..
+$ cd d
+$ ls
+4060174 j
+8033020 d.log
+5626152 d.ext
+7214296 k
+";
+
+    #[test]
+    fn test_a(){
+        let d =  Day7::create(INPUT.as_bytes());
+        d.solve_a();
+    }
+
+    #[test]
+    fn test_b(){
+        let d =  Day7::create(INPUT.as_bytes());
+        d.solve_b();
     }
 }

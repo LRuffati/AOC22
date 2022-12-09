@@ -9,8 +9,7 @@ mod day08;
 mod day09;
 mod day10;
 
-use std::fs::File;
-use std::io::BufReader;
+use std::io::BufRead;
 
 pub trait Day {
     const DAY: usize;
@@ -19,7 +18,7 @@ pub trait Day {
         format!("inputs/{:02}", Self::DAY)
     }
 
-    fn create(input: BufReader<File>) -> Self;
+    fn create<B: BufRead + 'static>(input: B) -> Self;
 
     fn solve_a(self);
 

@@ -1,5 +1,4 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use crate::days::Day;
 
 pub struct Day6(Box<dyn Iterator<Item=u8>>);
@@ -42,7 +41,7 @@ fn solve<const N: usize>(d: Day6, mut acc: Acc<N>) -> usize{
 impl Day for Day6 {
     const DAY: usize = 6;
 
-    fn create(input: BufReader<File>) -> Self {
+    fn create<B: BufRead>(input: B) -> Self {
         Day6(Box::new(input.lines().next().unwrap().unwrap().into_bytes().into_iter()))
     }
 
@@ -54,5 +53,29 @@ impl Day for Day6 {
     fn solve_b(self) {
         let acc = Acc::<14>::new();
         println!("{}", solve(self, acc));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    static INPUTS: [&str; 5] = ["mjqjpqmgbljsphdztnvjfqwrcgsmlb", "bvwbjplbgvbhsrlpgdmjqwftvncz",
+                                "nppdvjthqldpwncqszvftbrmjlhg", "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg",
+                                "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"];
+
+    #[test]
+    fn test_a(){
+        for i in INPUTS {
+            let d =  Day6::create(i.as_bytes());
+            d.solve_a();
+        }
+    }
+
+    #[test]
+    fn test_b(){
+        for i in INPUTS{
+            let d =  Day6::create(i.as_bytes());
+            d.solve_b();
+        }
     }
 }
