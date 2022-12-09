@@ -1,7 +1,8 @@
+use nom::InputTakeAtPosition;
 use nom::character::complete::{alphanumeric1, multispace0, digit1, multispace1};
 use nom::combinator::{map_res, map};
 use nom::error::{Error};
-use nom::multi::many0;
+use nom::multi::{many0, many1};
 use nom::sequence::{delimited, tuple};
 use nom::{IResult, combinator::value, sequence::preceded, branch::alt};
 use nom::bytes::complete::tag;
@@ -32,7 +33,11 @@ enum Command{
     CD(CD)
 }
 
-fn parse_command(s: &str) -> IResult<&str, Command>{
+fn non_space(input: &str) -> IResult<&str, &str> {
+    input.split_at_position_complete(char::is_whitespace)
+}
+
+fn parse_commands(s: &str) -> IResult<&str, Vec<Command>>{
     /*
     1. It begins with ""
     */
@@ -47,10 +52,10 @@ fn parse_command(s: &str) -> IResult<&str, Command>{
 
     let ls = map_res(preceded(tag("ls\n"), many0(
         alt((
-            map(delimited(tag("dir "), alphanumeric1, multispace0), |x: &str| {LSOut::Dir(x.to_string())}),
+            map(delimited(tag("dir "), non_space, multispace0), |x: &str| {LSOut::Dir(x.to_string())}),
             map(
                 //LSOut::File(1, "la".to_string()),
-                delimited(multispace0::<&str, Error<&str>>, tuple((digit1, multispace1, alphanumeric1)), multispace0),
+                delimited(multispace0::<&str, Error<&str>>, tuple((digit1, multispace1, non_space)), multispace0),
                 |res| {LSOut::File(res.0.parse::<usize>().unwrap(), res.2.to_string())}
             )
         ))
@@ -60,48 +65,75 @@ fn parse_command(s: &str) -> IResult<&str, Command>{
         r
     });
 
-    /*
-        alt((
-            delimited(tag("dir "), alphanumeric1, multispace0),
-            delimited(multispace0, tuple((digit1, preceded(multispace0, alphanumeric1))), multispace0)
-        ))
-    */
-
-    let mut parser = preceded(tag("$ "), alt((cd, ls)));
+    let mut parser = many0(delimited(tag("$ "), alt((cd, ls)), multispace0));
     return parser(s)
 }
 
+
 #[cfg(test)]
 mod tests {
-    use super::parse_command;
+    use super::parse_commands;
     use super::{Command, CD, CDPath, LS, LSOut};
 
     #[test]
     fn test_parse_cd_rt() {
-        assert_eq!(parse_command("$ cd /"), Ok(("", Command::CD(CD(CDPath::Root)))));
+        assert_eq!(parse_commands("$ cd /"), Ok(("", vec![Command::CD(CD(CDPath::Root))])));
     }
     #[test]
     fn test_parse_cd_par() {
-        assert_eq!(parse_command("$ cd .."), Ok(("", Command::CD(CD(CDPath::Parent)))));
+        assert_eq!(parse_commands("$ cd .."), Ok(("", vec![Command::CD(CD(CDPath::Parent))])));
     }
     #[test]
     fn test_parse_cd_chl() {
-        assert_eq!(parse_command("$ cd abc"), Ok(("", Command::CD(CD(CDPath::Child("abc".to_string()))))));
+        assert_eq!(parse_commands("$ cd abc"), Ok(("", vec![Command::CD(CD(CDPath::Child("abc".to_string())))])));
     }
     #[test]
     fn test_parse_ls_1dir() {
-        assert_eq!(parse_command("$ ls
+        assert_eq!(parse_commands("$ ls
 dir ciao
-1 la"), Ok(("", Command::LS(LS { out: vec![
+1 la.txt"), Ok(("", vec![Command::LS(LS { out: vec![
             LSOut::Dir("ciao".to_string()),
-            LSOut::File(1, "la".to_string())
-        ] }))));
+            LSOut::File(1, "la.txt".to_string())
+        ] })])));
 
-        let r = parse_command("$ ls
+        let r = parse_commands("$ ls
 dir abc
 123 asd
-324443 per
+324443 per.txt
 dir f");
         println!("Debug res parsed ls {:?}", r.unwrap());
+    }
+
+    #[test]
+    fn test_input_aoc() {
+        let t = "$ cd /
+$ ls
+dir a
+14848514 b.txt
+8504156 c.dat
+dir d
+$ cd a
+$ ls
+dir e
+29116 f
+2557 g
+62596 h.lst
+$ cd e
+$ ls
+584 i
+$ cd ..
+$ cd ..
+$ cd d
+$ ls
+4060174 j
+8033020 d.log
+5626152 d.ext
+7214296 k";
+        let r = parse_commands(t);
+        println!("{:?}", r);
+        assert!(r.is_ok(), "Didn't match a list of commands");
+        let ur = r.unwrap().1;
+        println!("{:?}, {}", ur, ur.len());
+        assert_eq!(ur.len(),10);
     }
 }
