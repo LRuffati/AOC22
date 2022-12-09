@@ -133,7 +133,6 @@ fn find_view<const t: bool>(line: impl IntoIterator<Item=Tree>, map: &mut BTreeM
         let right_dist_hp1 = full.get(idx).unwrap_or(&(len_v-1)) - coord;
         full.insert(idx, coord);
 
-
         match sorted.last() {
             Some(tr) if tr.0 == h => {
                 let right_dist_hp2 = lambda(tr) - coord;
