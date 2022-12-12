@@ -1,5 +1,5 @@
 use std::io::BufRead;
-use regex::{Match, Regex};
+use regex::Regex;
 
 pub struct Day(Vec<Instr>, usize, i32);
 
@@ -47,7 +47,7 @@ impl super::Day for Day {
         return Day(ret, clock, val);
     }
 
-    fn solve_a(mut self) {
+    fn solve_a(self) {
         let mut acc = 0;
         let f_cl = self.1;
         for i in (20..=f_cl).step_by(40) {
@@ -65,7 +65,7 @@ impl super::Day for Day {
         println!("{acc}")
     }
 
-    fn solve_b(mut self) {
+    fn solve_b(self) {
         for i in self.0 {
             if i.clock_beg % 40 == 1 {
                 println!();

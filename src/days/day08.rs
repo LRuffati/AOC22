@@ -35,7 +35,7 @@ impl Day for Day8 {
         Day8(x)
     }
 
-    fn solve_a(mut self) {
+    fn solve_a(self) {
         let mut vis: HashSet<Tree> = HashSet::new();
         //let all: HashMap<(usize, usize), u8> = HashMap::new();
         let mut iter = self.0.into_iter();
@@ -66,7 +66,7 @@ impl Day for Day8 {
                 vis.insert(*t);
             }
         }
-        for mut h in heaps_col.into_iter().skip(1) {
+        for h in heaps_col.into_iter().skip(1) {
             for t in h {
                 //println!("{:?} visible from low", t.0);
                 vis.insert(t);

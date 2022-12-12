@@ -132,8 +132,9 @@ $ ls
         let r = parse_commands(t);
         println!("{:?}", r);
         assert!(r.is_ok(), "Didn't match a list of commands");
-        let ur = r.unwrap().1;
+        let (rem, ur) = r.unwrap();
         println!("{:?}, {}", ur, ur.len());
         assert_eq!(ur.len(),10);
+        assert_eq!(rem,"");
     }
 }

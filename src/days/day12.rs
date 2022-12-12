@@ -88,7 +88,7 @@ impl super::Day for Day {
         };
     }
 
-    fn solve_a(mut self) {
+    fn solve_a(self) {
         let cols = self.n_cols;
         let rows = self.n_rows;
         let mut to_test = BinaryHeap::new();
@@ -122,7 +122,7 @@ impl super::Day for Day {
         println!("{}", res.unwrap());
     }
 
-    fn solve_b(mut self) {
+    fn solve_b(self) {
         let cols = self.n_cols;
         let rows = self.n_rows;
         let mut to_test = BinaryHeap::new();

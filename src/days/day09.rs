@@ -59,7 +59,7 @@ impl super::Day for Day {
         return Day(v);
     }
 
-    fn solve_a(mut self) {
+    fn solve_a(self) {
         let mut s = HashSet::new();
         for (_, i) in self.0 {
             //println!("{:?}", i);
@@ -68,7 +68,7 @@ impl super::Day for Day {
         println!("{}", s.len());
     }
 
-    fn solve_b(mut self) {
+    fn solve_b(self) {
         let mut s = HashSet::new();
         let mut t: [Coord; 8] = [(0,0); 8];
         s.insert(t[7]);

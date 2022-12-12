@@ -1,6 +1,6 @@
-use std::io::{BufRead, Read};
+use std::io::BufRead;
 use std::str::FromStr;
-use regex::{Match, Regex, RegexBuilder};
+use regex::{Regex, RegexBuilder};
 use crate::days::day11::Operand::{Old, Val};
 use crate::days::day11::Operation::{Add, Mul};
 
@@ -60,7 +60,6 @@ impl Operation {
 
 #[derive(Debug, Clone)]
 struct Monkey {
-    id: usize,
     items: Vec<isize>,
     div: isize,
     op: Operation,
@@ -117,13 +116,12 @@ impl super::Day for Day {
 
         let mut monkeys: Vec<Monkey> = Vec::new();
         for m in re.captures_iter(str.as_str()) {
-            let id = m.name("id").unwrap().as_str().parse().unwrap();
             let items = m.name("list").unwrap().as_str().split(", ").map(|x| x.parse().unwrap()).collect();
             let op= m.name("ops").unwrap().as_str().parse().unwrap();
             let div = m.name("div").unwrap().as_str().parse().unwrap();
             let dtr = m.name("dtr").unwrap().as_str().parse().unwrap();
             let dfl = m.name("dfl").unwrap().as_str().parse().unwrap();
-            monkeys.push(Monkey{id, items, div, op, dest: [dtr, dfl], ops: 0})
+            monkeys.push(Monkey{items, div, op, dest: [dtr, dfl], ops: 0})
         }
 
         return Day(monkeys);
