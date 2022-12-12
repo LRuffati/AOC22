@@ -8,36 +8,36 @@ use nom::{IResult, combinator::value, sequence::preceded, branch::alt};
 use nom::bytes::complete::tag;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-enum CDPath {
+enum CDPath<'a> {
     Root,
     Parent,
-    Child(String),
+    Child(&'a str),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-enum LSOut {
-    File(usize, String),
-    Dir(String)
+enum LSOut<'a> {
+    File(usize, &'a str),
+    Dir(&'a str)
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct LS {
-    out: Vec<LSOut>
+struct LS<'a> {
+    out: Vec<LSOut<'a>>
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct CD (CDPath);
+struct CD<'a> (CDPath<'a>);
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-enum Command{
-    LS(LS),
-    CD(CD)
+enum Command<'a>{
+    LS(LS<'a>),
+    CD(CD<'a>)
 }
 
 fn non_space(input: &str) -> IResult<&str, &str> {
     input.split_at_position_complete(char::is_whitespace)
 }
 
-fn parse_commands(s: &str) -> IResult<&str, Vec<Command>>{
+fn parse_commands<'a>(s: &'a str) -> IResult<&str, Vec<Command<'a>>>{
     /*
     1. It begins with ""
     */
@@ -45,18 +45,18 @@ fn parse_commands(s: &str) -> IResult<&str, Vec<Command>>{
         value(Command::CD(CD(CDPath::Root)), tag("/")),
         value(Command::CD(CD(CDPath::Parent)), tag("..")),
         map_res(alphanumeric1, |x: &str| {
-            let r: Result<Command, Error<&str>> = Result::Ok(Command::CD(CD(CDPath::Child(x.to_string()))));
+            let r: Result<Command, Error<&str>> = Result::Ok(Command::CD(CD(CDPath::Child(x))));
             r
         })
     )));
 
     let ls = map_res(preceded(tag("ls\n"), many0(
         alt((
-            map(delimited(tag("dir "), non_space, multispace0), |x: &str| {LSOut::Dir(x.to_string())}),
+            map(delimited(tag("dir "), non_space, multispace0), |x: &str| {LSOut::Dir(x)}),
             map(
                 //LSOut::File(1, "la".to_string()),
                 delimited(multispace0::<&str, Error<&str>>, tuple((digit1, multispace1, non_space)), multispace0),
-                |res| {LSOut::File(res.0.parse::<usize>().unwrap(), res.2.to_string())}
+                |res| {LSOut::File(res.0.parse::<usize>().unwrap(), res.2)}
             )
         ))
     )), |x| {
@@ -85,15 +85,15 @@ mod tests {
     }
     #[test]
     fn test_parse_cd_chl() {
-        assert_eq!(parse_commands("$ cd abc"), Ok(("", vec![Command::CD(CD(CDPath::Child("abc".to_string())))])));
+        assert_eq!(parse_commands("$ cd abc"), Ok(("", vec![Command::CD(CD(CDPath::Child("abc")))])));
     }
     #[test]
     fn test_parse_ls_1dir() {
         assert_eq!(parse_commands("$ ls
 dir ciao
 1 la.txt"), Ok(("", vec![Command::LS(LS { out: vec![
-            LSOut::Dir("ciao".to_string()),
-            LSOut::File(1, "la.txt".to_string())
+            LSOut::Dir("ciao"),
+            LSOut::File(1, "la.txt")
         ] })])));
 
         let r = parse_commands("$ ls
