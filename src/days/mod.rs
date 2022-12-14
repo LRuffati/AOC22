@@ -11,6 +11,8 @@ mod day10;
 mod day11;
 mod day12;
 mod day13;
+mod day14;
+//mod day07b;
 
 use std::io::BufRead;
 
@@ -28,4 +30,4 @@ pub trait Day {
     fn solve_b(self);
 }
 
-pub type Curr = day13::Day;
+pub type Curr = day14::Day;
