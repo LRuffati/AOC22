@@ -42,21 +42,19 @@ impl Path {
 }
 
 enum Node{
-    Dir{p: Path, sz: usize, files: Vec<(String, usize)>, dir: Vec<Path>},
-    File(Path, usize)
+    Dir{_p: Path, sz: usize, _files: Vec<(String, usize)>, dir: Vec<Path>},
 }
+
 impl Node {
     fn size(&self) -> usize {
         match self {
-            Node::Dir { p: _, sz, files: _, dir: _ } => *sz,
-            Node::File(_, sz) => *sz
+            Node::Dir { _p: _, sz, _files: _, dir: _ } => *sz,
         }
     }
 
     fn dirsize(&self) -> usize {
         match self {
-            Node::File(_, _) => 0,
-            _ => self.size()
+            Node::Dir { _p, sz: _, _files, dir: _ } => self.size(),
         }
 
     }
@@ -84,7 +82,7 @@ impl Day for Day7 {
             if let Some(dest) = caps.name("dest") {
                 if modified {
                     //println!("Inserting {:?}, sz: {}", curr, curr_sz);
-                    fs.insert(curr.clone(), Node::Dir { p: curr.clone(), sz: curr_sz, files: curr_fs, dir: curr_dr });
+                    fs.insert(curr.clone(), Node::Dir { _p: curr.clone(), sz: curr_sz, _files: curr_fs, dir: curr_dr });
                 }
                 curr_dr = Vec::new();
                 curr_fs = Vec::new();
@@ -110,20 +108,19 @@ impl Day for Day7 {
             }
         }
         //println!("Inserting {:?}, sz: {}", curr, curr_sz);
-        fs.insert(curr.clone(), Node::Dir { p: curr.clone(), sz: curr_sz, files: curr_fs, dir: curr_dr });
+        fs.insert(curr.clone(), Node::Dir { _p: curr.clone(), sz: curr_sz, _files: curr_fs, dir: curr_dr });
 
         //println!("Getting totals");
 
         for d in visited_dirs.into_iter().rev() {
             let mut entry = fs.remove(&d).unwrap();
             match &mut entry {
-                Node::Dir { p: _, sz, files: _, dir } => {
+                Node::Dir { _p: _, sz, _files: _, dir } => {
                     //println!("Tot sz of {:?}, start: {}", p, *sz);
                     for dc in dir {
                         *sz += fs.get(&dc).unwrap().size();
                     }
                 }
-                _ => {}
             }
             //println!("{:?}, {}", d, entry.size());
             fs.insert(d.clone(), entry);

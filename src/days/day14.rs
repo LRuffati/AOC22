@@ -1,6 +1,6 @@
-use std::{io::BufRead, collections::HashSet, cmp::{min, max}, hash::Hash};
+use std::{io::BufRead, collections::HashSet, cmp::max};
 
-use nom::{IResult, sequence::{separated_pair, tuple, preceded}, character::complete, bytes::complete::tag, multi::many0};
+use nom::{sequence::{separated_pair, tuple, preceded}, character::complete, bytes::complete::tag, multi::many0};
 
 #[derive(Debug)]
 pub struct Day{
@@ -10,10 +10,10 @@ pub struct Day{
 }
 
 fn parse_seq(inp: &str) -> ((i64,i64), Vec<(i64, i64)>) {
-    let mut pair1 = separated_pair(complete::i64::<&str, ()>, tag(","), complete::i64);
-    let mut pair2 = separated_pair(complete::i64::<&str, ()>, tag(","), complete::i64);
+    let pair1 = separated_pair(complete::i64::<&str, ()>, tag(","), complete::i64);
+    let pair2 = separated_pair(complete::i64::<&str, ()>, tag(","), complete::i64);
     let mut list = tuple((pair1, many0(preceded(tag(" -> "), pair2))));
-    let (r, (f, mut tl)) = list(inp).unwrap();
+    let (_, (f, tl)) = list(inp).unwrap();
     (f, tl)
 }
 
@@ -186,10 +186,8 @@ impl super::Day for Day {
     }
 
     fn solve_b(mut self) {
-        let mut bot = self.bott.iter().map(|(a, b)| *b).reduce(|a, e| max(a, e)).unwrap();
+        let mut bot = self.bott.iter().map(|(_, b)| *b).reduce(|a, e| max(a, e)).unwrap();
         bot+=2;
-        let max_x = self.bott.iter().map(|(a, b)| *a).reduce(|a, e| max(a, e)).unwrap();
-        let min_x = self.bott.iter().map(|(a, b)| *a).reduce(|a, e| min(a, e)).unwrap();
 
         for x in (500-bot-5)..=(500+bot+5) {
             self.full.insert((x, bot));
@@ -216,7 +214,7 @@ impl super::Day for Day {
         }
         let mut cntr = 1;
         
-        'out: loop {
+        loop {
             //repr(&self.full, &orig, &path_s);
             //println!("{cntr}");
             let pos_o = path.pop();

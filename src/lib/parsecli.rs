@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use nom::InputTakeAtPosition;
 use nom::character::complete::{alphanumeric1, multispace0, digit1, multispace1};
 use nom::combinator::{map_res, map};
@@ -8,27 +10,27 @@ use nom::{IResult, combinator::value, sequence::preceded, branch::alt};
 use nom::bytes::complete::tag;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-enum CDPath<'a> {
+pub enum CDPath<'a> {
     Root,
     Parent,
     Child(&'a str),
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-enum LSOut<'a> {
+pub enum LSOut<'a> {
     File(usize, &'a str),
     Dir(&'a str)
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct LS<'a> {
-    out: Vec<LSOut<'a>>
+pub struct LS<'a> {
+    pub out: Vec<LSOut<'a>>
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct CD<'a> (CDPath<'a>);
+pub struct CD<'a> (pub CDPath<'a>);
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-enum Command<'a>{
+pub enum Command<'a>{
     LS(LS<'a>),
     CD(CD<'a>)
 }
@@ -37,7 +39,7 @@ fn non_space(input: &str) -> IResult<&str, &str> {
     input.split_at_position_complete(char::is_whitespace)
 }
 
-fn parse_commands<'a>(s: &'a str) -> IResult<&str, Vec<Command<'a>>>{
+pub fn parse_commands<'a>(s: &'a str) -> IResult<&str, Vec<Command<'a>>>{
     /*
     1. It begins with ""
     */

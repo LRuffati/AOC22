@@ -1,6 +1,5 @@
-use std::{io::BufRead, collections::{BinaryHeap, HashSet}, cmp::max};
+use std::{io::BufRead, collections::HashSet, cmp::max};
 
-use itertools::any;
 use regex::Regex;
 
 type Coord = (i64, i64);
@@ -75,7 +74,7 @@ impl super::Day for Day {
     const DAY: usize = 15;
 
     fn create<B: BufRead>(input: B) -> Self {
-        let mut re = Regex::new(r"Sensor at x=(?P<s_x>-?\d+), y=(?P<s_y>-?\d+): closest beacon is at x=(?P<b_x>-?\d+), y=(?P<b_y>-?\d+)").unwrap();
+        let re = Regex::new(r"Sensor at x=(?P<s_x>-?\d+), y=(?P<s_y>-?\d+): closest beacon is at x=(?P<b_x>-?\d+), y=(?P<b_y>-?\d+)").unwrap();
         let v = input.lines().map(|l|{
             let l = l.unwrap();
             let coll = re.captures(l.as_str()).unwrap();
@@ -91,7 +90,7 @@ impl super::Day for Day {
         return Day(v, 2000000, 4000000);
     }
 
-    fn solve_a(mut self) {
+    fn solve_a(self) {
         let y_scan: i64 = self.1;
         let mut ranges_cov: Vec<Range> = self.0.iter().filter_map(|Scan { dist, sensor: (x, y), beacon: _ }| {
             let offs = y.abs_diff(y_scan);
@@ -123,7 +122,7 @@ impl super::Day for Day {
         println!("{tot}");
     }
 
-    fn solve_b(mut self) {
+    fn solve_b(self) {
         let mut res = None;
         'out: for i in self.0.iter(){
             for p in MarginIter::new(i.sensor, i.dist) {
